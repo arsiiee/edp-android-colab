@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.test.espresso.base.Default
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.font.FontFamily
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,22 +64,23 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun BusinessCard() {
     Column(Modifier.fillMaxSize().background(
-        Brush.verticalGradient(
-        colors = listOf(Color(0xFFFBF8F5), Color(0xFFEFE7E0))
-    )),
+        brush = Brush.verticalGradient(
+            colors = listOf(Color(0xFFF5A7A6), Color(0xFFF5CF9F))
+        )
+    ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
         Image(painterResource(R.drawable.unnamed),
             contentDescription = "Profile photo",
             contentScale = ContentScale.Crop,
                 alignment = Alignment.TopCenter,
-            modifier = Modifier.size(120.dp)
+            modifier = Modifier.size(150.dp)
                 .clip(CircleShape)
                 .border(2.dp, Color(0xFF771C1B), CircleShape))
         Spacer(Modifier.height(16.dp))
-        Text("Arweyne Zoe A Salcedo.", fontSize = 24.sp,
+        Text("Arweyne Zoe A Salcedo.", fontFamily = FontFamily.Cursive, fontSize = 30.sp,
             fontWeight = FontWeight.Bold, color = Color(0xFF771C1B))
-        Text("Developer", fontSize = 16.sp,
+        Text("Developer", fontFamily = FontFamily.SansSerif, fontSize = 20.sp,
             color = Color.DarkGray)
         Spacer(Modifier.height(24.dp))
 // a reusable contact row
