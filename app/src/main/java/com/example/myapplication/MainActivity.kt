@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -89,6 +91,19 @@ fun BusinessCard() {
             "+63 900 000 0000")
         ContactRow(Icons.Default.Email,
             "az@salcedo.com")
+    }
+    Canvas(Modifier.fillMaxSize()) {
+        val dotColor = Color(0xFF4A0F0E).copy(alpha = 0.03f)
+        val spacing = 24.dp.toPx()
+        var y = 0f
+        while (y < size.height) {
+            var x = 0f
+            while (x < size.width) {
+                drawCircle(dotColor, radius = 1.5f, center = Offset(x, y))
+                x += spacing
+            }
+            y += spacing
+        }
     }
 }
 
