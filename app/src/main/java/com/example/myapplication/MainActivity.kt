@@ -221,7 +221,7 @@ fun ProfileScreen() {
             Spacer(Modifier.height(20.dp))
             AvatarWithBadge()
             Spacer(Modifier.height(12.dp))
-            NameAndRole(name = "Ada Lovelace", role = "Android Developer")
+            NameAndRole(name = "Rwyne Salcedo", role = "Game Developer")
             Spacer(Modifier.height(20.dp))
             ActionButtonsRow()
             Spacer(Modifier.height(20.dp))
