@@ -39,7 +39,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -56,6 +57,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -148,6 +150,8 @@ private val DarkColors = darkColorScheme(
 )
 
 // Title bar -> titleLarge bold; name -> headlineSmall; role/labels -> bodyMedium.
+// Slight negative letter-spacing on the headline gives the name a tighter,
+// more "designed" feel instead of default loose tracking.
 private val ProfileTypography = androidx.compose.material3.Typography(
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,
@@ -157,22 +161,32 @@ private val ProfileTypography = androidx.compose.material3.Typography(
     ),
     headlineSmall = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 24.sp,
-        lineHeight = 30.sp
+        fontWeight = FontWeight.Bold,
+        fontSize = 25.sp,
+        lineHeight = 30.sp,
+        letterSpacing = (-0.3).sp
     ),
     bodyMedium = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 20.sp
+    ),
+    labelLarge = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.2.sp
     )
 )
 
-// Cards use the medium shape (16.dp); buttons stay at the M3 default (small)
-// since `small` is left un-overridden here.
+// Cards use a slightly larger medium shape (20.dp instead of the strict
+// 16.dp minimum) for a softer, friendlier card silhouette; buttons keep
+// their M3 default (small) since `small` is left un-overridden.
 private val ProfileShapes = Shapes(
-    medium = RoundedCornerShape(16.dp)
+    medium = RoundedCornerShape(20.dp),
+    large = RoundedCornerShape(28.dp)
 )
 
 /**
@@ -202,11 +216,14 @@ fun ProfileTheme(
 @Composable
 fun ProfileScreen() {
     Scaffold(
-        topBar = { ProfileTopBar() },
         floatingActionButton = {
-            FloatingActionButton(onClick = { /* TODO: add contact */ }) {
-                Icon(Icons.Default.Add, contentDescription = "Add contact")
-            }
+            ExtendedFloatingActionButton(
+                onClick = { /* TODO: add contact */ },
+                icon = { Icon(Icons.Default.Add, contentDescription = null) },
+                text = { Text("Add") },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
         }
     ) { innerPadding ->
         Column(
@@ -214,21 +231,25 @@ fun ProfileScreen() {
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp),
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(20.dp))
-            AvatarWithBadge()
-            Spacer(Modifier.height(12.dp))
-            NameAndRole(name = "Rwyne Salcedo", role = "Game Developer")
-            Spacer(Modifier.height(20.dp))
-            ActionButtonsRow()
-            Spacer(Modifier.height(20.dp))
-            StatsCard()
-            Spacer(Modifier.height(16.dp))
-            ContactInfoCard()
-            Spacer(Modifier.height(88.dp)) // clears the FAB when scrolled to bottom
+            HeroHeader()
+            Spacer(Modifier.height(24.dp))
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                ActionButtonsRow()
+                Spacer(Modifier.height(24.dp))
+                StatsCard()
+                Spacer(Modifier.height(16.dp))
+                ContactInfoCard()
+                Spacer(Modifier.height(96.dp)) // clears the extended FAB
+            }
         }
     }
 }
@@ -254,41 +275,84 @@ private fun ProfileTopBar() {
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            containerColor = Color.Transparent,
             titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        ),
+        modifier = Modifier.background(Color.Transparent)
+    )
+}
+
+// ---- Hero header: gradient band behind the top bar + avatar + name --------
+// Pulling the top bar, avatar, and name into one gradient-backed block with
+// rounded bottom corners reads as a single "hero" section rather than a
+// plain list, and gives the primary/primaryContainer colors real presence
+// instead of confining them to a thin app-bar strip.
+@Composable
+private fun HeroHeader() {
+    val gradient = Brush.verticalGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.primaryContainer,
+            MaterialTheme.colorScheme.surface
         )
     )
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+            .background(gradient),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        ProfileTopBar()
+        Spacer(Modifier.height(8.dp))
+        AvatarWithBadge()
+        Spacer(Modifier.height(14.dp))
+        NameAndRole(name = "Rwyne Zoe", role = "Game Developer")
+        Spacer(Modifier.height(20.dp))
+    }
 }
 
 // ---- Region B: Avatar + status badge ---------------------------------------
 @Composable
 private fun AvatarWithBadge() {
-    Box(modifier = Modifier.size(96.dp)) {
+    Box(modifier = Modifier.size(104.dp)) {
         // Modifier order matters here: clip -> background -> border.
         // clip first so the background/border get cut to the circle;
         // background before border so the border strokes the circle's
         // outer edge instead of being painted over by a rectangular fill.
-        Image(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground),
-            contentDescription = "Profile photo",
-            contentScale = ContentScale.Crop,
+        // A slightly thicker, primary-colored ring plus a soft surface
+        // "halo" gap gives the avatar the look of sitting on top of the
+        // gradient rather than being flush with it.
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
-        )
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(4.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.pfp),
+                contentDescription = "Profile photo",
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.TopCenter,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .border(2.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
+            )
+        }
 
         // Status dot, pinned to the bottom-end corner of the Box.
         Box(
             modifier = Modifier
-                .size(18.dp)
+                .size(20.dp)
                 .align(Alignment.BottomEnd)
                 .clip(CircleShape)
                 .background(StatusOnline)
-                .border(2.dp, MaterialTheme.colorScheme.surface, CircleShape)
+                .border(3.dp, MaterialTheme.colorScheme.surface, CircleShape)
         )
     }
 }
@@ -316,28 +380,38 @@ private fun NameAndRole(name: String, role: String) {
 private fun ActionButtonsRow() {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Button(
             onClick = { /* TODO: message action */ },
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
+                .height(48.dp),
+            shape = RoundedCornerShape(14.dp),
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 2.dp,
+                pressedElevation = 0.dp
+            )
         ) {
             Icon(Icons.Default.Email, contentDescription = null, modifier = Modifier.size(18.dp))
-            Spacer(Modifier.width(6.dp))
-            Text("Message")
+            Spacer(Modifier.width(8.dp))
+            Text("Message", style = MaterialTheme.typography.labelLarge)
         }
 
         OutlinedButton(
             onClick = { /* TODO: call action */ },
-            modifier = Modifier.weight(1f),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
+            modifier = Modifier
+                .weight(1f)
+                .height(48.dp),
+            shape = RoundedCornerShape(14.dp),
+            border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.secondary),
             colors = ButtonDefaults.outlinedButtonColors(
                 contentColor = MaterialTheme.colorScheme.secondary
             )
         ) {
             Icon(Icons.Default.Call, contentDescription = null, modifier = Modifier.size(18.dp))
-            Spacer(Modifier.width(6.dp))
-            Text("Call")
+            Spacer(Modifier.width(8.dp))
+            Text("Call", style = MaterialTheme.typography.labelLarge)
         }
     }
 }
@@ -348,19 +422,33 @@ private fun StatsCard() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+                .padding(vertical = 18.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             StatItem(number = "128", label = "Posts")
+            StatDivider()
             StatItem(number = "2.4K", label = "Followers")
+            StatDivider()
             StatItem(number = "312", label = "Following")
         }
     }
+}
+
+@Composable
+private fun StatDivider() {
+    Box(
+        modifier = Modifier
+            .height(32.dp)
+            .width(1.dp)
+            .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+    )
 }
 
 @Composable
@@ -368,9 +456,10 @@ private fun StatItem(number: String, label: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = number,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.primary
         )
+        Spacer(Modifier.height(2.dp))
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
@@ -385,13 +474,20 @@ private fun ContactInfoCard() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            ContactRow(icon = Icons.Default.Email, text = "ada.lovelace@example.com")
-            Spacer(Modifier.height(12.dp))
+        Column(modifier = Modifier.padding(vertical = 8.dp)) {
+            ContactRow(icon = Icons.Default.Email, text = "rwyne.zoe@gmail.com")
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
+            )
             ContactRow(icon = Icons.Default.Phone, text = "+63 900 000 0000")
-            Spacer(Modifier.height(12.dp))
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
+            )
             ContactRow(icon = Icons.Default.LocationOn, text = "Cagayan de Oro, Philippines")
         }
     }
@@ -399,13 +495,30 @@ private fun ContactInfoCard() {
 
 @Composable
 private fun ContactRow(icon: ImageVector, text: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary
-        )
-        Spacer(Modifier.width(8.dp))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Icon sits inside a soft tinted "chip" circle instead of floating
+        // bare on the card — small touch that makes each row feel designed
+        // rather than a raw icon+text pairing.
+        Box(
+            modifier = Modifier
+                .size(36.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primaryContainer),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+        Spacer(Modifier.width(12.dp))
         Text(
             text = text,
             style = MaterialTheme.typography.bodyMedium,
