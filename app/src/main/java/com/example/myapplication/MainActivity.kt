@@ -7,10 +7,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,13 +46,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,12 +58,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.myapplication.ui.theme.ProfileTheme
+import com.example.myapplication.ui.theme.StatusOnline
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,134 +74,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
-
-// =============================================================================
-// THEME — colors, typography, shapes, and the ProfileTheme wrapper.
-// (Part A of the lab: all defined in one place, no hard-coded colors below.)
-// =============================================================================
-
-// ---- Brand palette --------------------------------------------------------
-// Only six roles were given per mode; every other scheme role is derived
-// from them so text/icons stay legible on every surface.
-
-// Light
-private val LightPrimary            = Color(0xFF771C1B)
-private val LightOnPrimary          = Color(0xFFFFFFFF)
-private val LightPrimaryContainer   = Color(0xFFE9C9C8)
-private val LightOnPrimaryContainer = Color(0xFF2C0A09)
-private val LightSecondary          = Color(0xFF9E4744)
-private val LightOnSecondary        = Color(0xFFFFFFFF)
-private val LightSurface            = Color(0xFFFFFBFF)
-private val LightOnSurface          = Color(0xFF201A19)
-private val LightOnSurfaceVariant   = Color(0xFF5A4D4C)
-private val LightOutline            = Color(0xFF8D7371)
-
-// Dark
-private val DarkPrimary            = Color(0xFFE0A3A0)
-private val DarkOnPrimary          = Color(0xFF511313)
-private val DarkPrimaryContainer   = Color(0xFF651817)
-private val DarkOnPrimaryContainer = Color(0xFFFFDAD8)
-private val DarkSecondary          = Color(0xFFD49B99)
-private val DarkOnSecondary        = Color(0xFF5C1614)
-private val DarkSurface            = Color(0xFF1A1110)
-private val DarkOnSurface          = Color(0xFFEDE0DE)
-private val DarkOnSurfaceVariant   = Color(0xFFC9B8B7)
-private val DarkOutline            = Color(0xFFA48C8A)
-
-// Non-role accent for the "online" status dot on the avatar badge. Not part
-// of the M3 role system (nothing ever sits "on" it), so a literal is fine
-// here — every other color in the screen must come from the theme.
-private val StatusOnline = Color(0xFF4CAF50)
-
-private val LightColors = lightColorScheme(
-    primary = LightPrimary,
-    onPrimary = LightOnPrimary,
-    primaryContainer = LightPrimaryContainer,
-    onPrimaryContainer = LightOnPrimaryContainer,
-    secondary = LightSecondary,
-    onSecondary = LightOnSecondary,
-    surface = LightSurface,
-    onSurface = LightOnSurface,
-    onSurfaceVariant = LightOnSurfaceVariant,
-    outline = LightOutline,
-    background = LightSurface,
-    onBackground = LightOnSurface
-)
-
-private val DarkColors = darkColorScheme(
-    primary = DarkPrimary,
-    onPrimary = DarkOnPrimary,
-    primaryContainer = DarkPrimaryContainer,
-    onPrimaryContainer = DarkOnPrimaryContainer,
-    secondary = DarkSecondary,
-    onSecondary = DarkOnSecondary,
-    surface = DarkSurface,
-    onSurface = DarkOnSurface,
-    onSurfaceVariant = DarkOnSurfaceVariant,
-    outline = DarkOutline,
-    background = DarkSurface,
-    onBackground = DarkOnSurface
-)
-
-// Title bar -> titleLarge bold; name -> headlineSmall; role/labels -> bodyMedium.
-// Slight negative letter-spacing on the headline gives the name a tighter,
-// more "designed" feel instead of default loose tracking.
-private val ProfileTypography = androidx.compose.material3.Typography(
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Bold,
-        fontSize = 22.sp,
-        lineHeight = 28.sp
-    ),
-    headlineSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Bold,
-        fontSize = 25.sp,
-        lineHeight = 30.sp,
-        letterSpacing = (-0.3).sp
-    ),
-    bodyMedium = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
-        lineHeight = 20.sp
-    ),
-    labelLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.2.sp
-    )
-)
-
-// Cards use a slightly larger medium shape (20.dp instead of the strict
-// 16.dp minimum) for a softer, friendlier card silhouette; buttons keep
-// their M3 default (small) since `small` is left un-overridden.
-private val ProfileShapes = Shapes(
-    medium = RoundedCornerShape(20.dp),
-    large = RoundedCornerShape(28.dp)
-)
-
-/**
- * App-wide theme. Defaults to following the system setting, but exposes
- * [darkTheme] explicitly so both @Preview functions below can force a mode
- * without needing an emulator or device.
- */
-@Composable
-fun ProfileTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
-) {
-    val colorScheme = if (darkTheme) DarkColors else LightColors
-
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = ProfileTypography,
-        shapes = ProfileShapes,
-        content = content
-    )
 }
 
 // =============================================================================
