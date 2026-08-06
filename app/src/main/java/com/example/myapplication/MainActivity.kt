@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.test.espresso.base.Default
+import androidx.compose.material3.Typography
 
 
 // Maroon Colors
@@ -98,7 +99,7 @@ fun ProfileScreen() {
                 ) {
 
                     Text(
-                        "KA",
+                        "AS",
                         color = Color.White,
                         style = MaterialTheme.typography.headlineMedium
                     )
@@ -245,13 +246,34 @@ fun InfoRow(
     }
 
 }
+private val LightColors = lightColorScheme(
+    primary = Color(0xFF6650a4),
+    secondary = Color(0xFF625b71),
+    tertiary = Color(0xFF7D5260)
+)
 
-@Preview(showBackground = true)
+private val DarkColors = darkColorScheme(
+    primary = Color(0xFFD0BCFF),
+    secondary = Color(0xFFCCC2DC),
+    tertiary = Color(0xFFEFB8C8)
+)
+
+@Preview(showBackground = true, name = "Profile - Light")
 @Composable
 fun LightPreview() {
-    ProfileTheme {
+    ProfileTheme(darkTheme = false) {
         ProfileScreen()
     }
+}
+
+@Composable
+fun ProfileTheme(darkTheme: Boolean, content: @Composable () -> Unit) {
+    val colorScheme = if (darkTheme) DarkColors else LightColors
+
+    MaterialTheme(
+        colorScheme = colorScheme,
+        content = content
+    )
 }
 
 @Preview(
@@ -260,7 +282,8 @@ fun LightPreview() {
 )
 @Composable
 fun DarkPreview() {
-    ProfileTheme {
+    ProfileTheme(darkTheme = true) {
         ProfileScreen()
     }
 }
+
